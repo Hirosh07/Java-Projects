@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ${NAME} extends JPanel implements ActionListener {
+public class SnakeGame extends JPanel implements ActionListener {
 
     private final int B_WIDTH = 300;
     private final int B_HEIGHT = 300;
@@ -17,6 +17,7 @@ public class ${NAME} extends JPanel implements ActionListener {
     private int dots;
     private int apple_x;
     private int apple_y;
+    private int score;
 
     private boolean leftDirection = false;
     private boolean rightDirection = true;
@@ -26,7 +27,7 @@ public class ${NAME} extends JPanel implements ActionListener {
 
     private Timer timer;
 
-    public ${NAME}() {
+    public SnakeGame() {
         initBoard();
     }
 
@@ -42,6 +43,7 @@ public class ${NAME} extends JPanel implements ActionListener {
 
     private void initGame() {
         dots = 3;
+        score = 0;
 
         for (int z = 0; z < dots; z++) {
             x[z] = 50 - z * DOT_SIZE;
@@ -75,6 +77,9 @@ public class ${NAME} extends JPanel implements ActionListener {
                 g.fillRect(x[z], y[z], DOT_SIZE, DOT_SIZE);
             }
 
+            g.setColor(Color.white);
+            g.drawString("Score: " + score, 10, 20);
+
             Toolkit.getDefaultToolkit().sync();
 
         } else {
@@ -84,12 +89,14 @@ public class ${NAME} extends JPanel implements ActionListener {
 
     private void gameOver(Graphics g) {
         String msg = "Game Over";
+        String scoreMsg = "Final Score: " + score;
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2 - 10);
+        g.drawString(scoreMsg, (B_WIDTH - metr.stringWidth(scoreMsg)) / 2, B_HEIGHT / 2 + 10);
 
         // Add code to reset the game and start a new game
         inGame = false;
@@ -107,6 +114,7 @@ public class ${NAME} extends JPanel implements ActionListener {
 
     private void resetGame() {
         dots = 3;
+        score = 0;
         for (int z = 0; z < dots; z++) {
             x[z] = 50 - z * DOT_SIZE;
             y[z] = 50;
@@ -119,6 +127,7 @@ public class ${NAME} extends JPanel implements ActionListener {
     private void checkApple() {
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
             dots++;
+            score++;
             locateApple();
         }
     }
@@ -157,85 +166,3 @@ public class ${NAME} extends JPanel implements ActionListener {
             inGame = false;
         }
 
-        if (y[0] < 0) {
-            inGame = false;
-        }
-
-        if (x[0] >= B_WIDTH) {
-            inGame = false;
-        }
-
-        if (x[0] < 0) {
-            inGame = false;
-        }
-
-        if (!inGame) {
-            timer.stop();
-        }
-    }
-
-    private void locateApple() {
-        int r = (int) (Math.random() * RAND_POS);
-        apple_x = ((r * DOT_SIZE));
-
-        r = (int) (Math.random() * RAND_POS);
-        apple_y = ((r * DOT_SIZE));
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (inGame) {
-            checkApple();
-            checkCollision();
-            move();
-        }
-        repaint();
-    }
-
-    private class TAdapter extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            int key = e.getKeyCode();
-
-            if (!inGame) {
-                return; // Ignore key presses if the game is over
-            }
-
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
-                leftDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-                rightDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-                upDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-                downDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-        }
-    }
-
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            JFrame frame = new JFrame("Snake");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(new ${NAME}());
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
-    }
-}
